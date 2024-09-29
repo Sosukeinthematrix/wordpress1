@@ -1,14 +1,16 @@
-# Use WordPress with PHP 7.4 and Apache
-FROM wordpress:php7.4-apache
+FROM php:7.4-apache
 
-# Update package lists and install magic-wormhole (if still needed)
-RUN apt-get update && apt-get install -y magic-wormhole
+# Install necessary PHP extensions for WordPress
+RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Change the shell for www-data user
-RUN usermod -s /bin/bash www-data
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
-# Change ownership of the WordPress directory
-RUN chown www-data:www-data /var/www
+# Copy WordPress files
+COPY . /var/www/html/
 
-# Set the user to www-data for running the container
-USER www-data:www-data
+# Set correct permissions for WordPress
+RUN chown -R www-data:www-data /var/www/html/
+
+# Expose port 80 for Apache
+EXPOSE 80
